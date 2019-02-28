@@ -1,0 +1,73 @@
+
+
+#include <IRremote.h>
+
+int lm=9;//folosesc pinul 9 al placutei Arduino pentru pinul 7 al driver-ului
+int lmr=8;//folosesc pinul 8 al placutei Arduino pentru pinul 2 al driver-ului
+int rm=10;//folosesc pinul 10 al placutei Arduino pentru pinul 10 al driver-ului
+int rmr=11;//folosesc pinul 11 al placutei Arduino pentru pinul 15 al driver-ului
+
+int sp=3;
+int RECV_PIN = 6;//pinul 6 de pe placuta Arduino e folosit ca receptor pentru semnalele infrarosii
+IRrecv irrecv(RECV_PIN);
+decode_results results;
+
+void setup()
+{
+  pinMode(lm,OUTPUT);
+  pinMode(lmr,OUTPUT);
+  pinMode(rm,OUTPUT);
+  pinMode(rmr,OUTPUT);
+  Serial.begin(9600);
+  irrecv.enableIRIn(); // Pornire senzor IR
+}
+
+void loop()
+{
+  if (irrecv.decode(&results))
+    {
+     Serial.println(results.value, HEX);
+     irrecv.resume(); // Receptioneaza semnalele emise de telecomanda
+    }
+     analogWrite(sp,255);
+   //masina merge inainte
+    if(results.value==0xFF18E7)
+    {
+      digitalWrite(lm,HIGH);
+      digitalWrite(lmr,LOW);
+      digitalWrite(rm,LOW);
+      digitalWrite(rmr,HIGH);
+    }
+    //masina merge cu spatele
+    if(results.value==0xFF38C7)
+    {
+      digitalWrite(lm,LOW);
+      digitalWrite(lmr,HIGH);
+      digitalWrite(rm,HIGH);
+      digitalWrite(rmr,LOW);
+    }
+    //masina se misca in stanga
+     if(results.value==0xFF10EF)
+    {
+      digitalWrite(lm,HIGH);
+      digitalWrite(lmr,LOW);
+      digitalWrite(rm,LOW);
+      digitalWrite(rmr,LOW);
+    }
+    //masina se misca in dreapta
+     if(results.value==0xFF5AA5)
+    {
+      digitalWrite(lm,LOW);
+      digitalWrite(lmr,LOW);
+      digitalWrite(rm,LOW);
+      digitalWrite(rmr,HIGH);
+    }
+    //masina se opreste
+    if(results.value==0xFF6897)
+    {
+      digitalWrite(lm,HIGH);
+      digitalWrite(lmr,HIGH);
+      digitalWrite(rm,HIGH);
+      digitalWrite(rmr,HIGH);
+    }
+}
